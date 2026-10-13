@@ -1,6 +1,6 @@
 {
   "name": "gladys-vesync",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Gladys Assistant integration for VeSync: Levoit air purifiers and humidifiers, Etekcity plugs.",
   "type": "module",

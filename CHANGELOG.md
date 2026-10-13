@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-13
+
 ### Added
 
 - Levoit air purifiers through the VeSync cloud (Core 200S, 300S, 400S, 600S,
@@ -31,4 +33,5 @@ the notes of the version's GitHub Release.
 - Feature names and mode lists in English, French, German and Spanish;
   documentation in the four languages.
 
-[Unreleased]: https://github.com/guim31/gladys-vesync/commits/main
+[Unreleased]: https://github.com/guim31/gladys-vesync/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-vesync/releases/tag/v1.0.1
