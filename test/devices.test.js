@@ -1,240 +1,249 @@
+// -----------------------------------------------------------------------------
+// Reading the devices: every recorded answer of pyvesync's and Home
+// Assistant's tests, parsed into the values Gladys receives.
+// -----------------------------------------------------------------------------
+
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { MODULES } from '../src/devices/index.js';
+import { LIQUID_STATE } from '../src/devices/humidifier.js';
+import { findModel, MODELS, modeKeys } from '../src/vesync/models.js';
 import {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_POLL_FREQUENCIES,
-  DEVICE_TRANSPORTS,
-} from '@gladysassistant/integration-sdk';
-import { createFakeGladys } from '@gladysassistant/integration-sdk/testing';
-import {
-  DEVICE_BLUEPRINTS,
-  buildDiscoveredDevices,
-  buildTransportEntries,
-  createPoller,
-  findBlueprintByDevice,
-  identifyDevice,
-} from '../src/devices/index.js';
-import { simulateLanSession } from '../src/devices/plug.js';
-import { normalizeConfig } from '../src/config.js';
+  FIXTURE_TYPES,
+  HOME_ASSISTANT,
+  innerResult,
+  pyvesyncDetail,
+} from './helpers/fakeVesync.js';
 
-const gladys = createFakeGladys();
-const config = normalizeConfig();
+function parse(deviceType, answer) {
+  const model = findModel(deviceType);
+  assert.ok(model, `${deviceType} is supported`);
+  const module = MODULES[model.kind];
+  const state = module.parseState(model, innerResult(answer));
+  return { state, values: module.featureValues(state), model };
+}
 
-test('every blueprint exposes the required shape', () => {
-  for (const bp of DEVICE_BLUEPRINTS) {
-    assert.equal(typeof bp.key, 'string', 'key must be a string');
-    assert.equal(typeof bp.deviceExternalId, 'function', 'deviceExternalId must be a function');
-    assert.equal(typeof bp.buildDevice, 'function', 'buildDevice must be a function');
+const fromPyvesync = (key) => parse(FIXTURE_TYPES[key], pyvesyncDetail(key));
+
+test('Core purifiers (pyvesync answers)', () => {
+  const core200 = fromPyvesync('Core200S');
+  assert.deepEqual(core200.values, {
+    power: 1,
+    mode: { text: 'manual' },
+    fan_speed: 1,
+    pm25: undefined,
+    filter_life: 80,
+    child_lock: 1,
+    display: 1,
+  });
+  for (const key of ['Core300S', 'Core400S', 'Core600S']) {
+    const { values, state } = fromPyvesync(key);
+    assert.equal(values.pm25, 3, key);
+    assert.equal(state.airQuality, 2, `${key}: "good"`);
+    assert.equal(values.filter_life, 80, key);
   }
 });
 
-test('buildDiscoveredDevices returns one payload per blueprint', () => {
-  const devices = buildDiscoveredDevices(gladys, config);
-  assert.equal(devices.length, DEVICE_BLUEPRINTS.length);
-  for (const device of devices) {
-    assert.equal(typeof device.name, 'string');
-    assert.ok(device.external_id, 'each device has an external_id');
-    assert.ok(Array.isArray(device.features) && device.features.length > 0);
+test('Vital, EverestAir and Sprout Air purifiers (pyvesync answers)', () => {
+  for (const key of ['LAP-V102S', 'LAP-V201S', 'EL551S']) {
+    const { values, state } = fromPyvesync(key);
+    assert.equal(values.power, 1, key);
+    assert.deepEqual(values.mode, { text: 'manual' }, key);
+    // Manual: the slider shows the setting (manualSpeedLevel), not the motor.
+    assert.equal(values.fan_speed, 2, key);
+    assert.equal(values.pm25, 3, key);
+    assert.equal(values.filter_life, 80, key);
+    assert.equal(values.child_lock, 1, `${key}: 1 or "on"`);
+    assert.equal(values.display, 1, key);
+    assert.equal(state.airQuality, 2, key);
   }
+  const sprout = fromPyvesync('LAP-B851S-WUS');
+  assert.equal(sprout.values.pm25, 3);
+  assert.equal(sprout.values.filter_life, undefined, 'the Sprout Air reports no filter life');
 });
 
-test('Gladys accepts the discovery payload', async () => {
-  // The SDK fake checks the payload like the host API does: external_id
-  // prefix, known category/type/unit, poll_frequency... A refusal is a 400
-  // for the WHOLE list, so no device would show up in the Discovery tab.
-  const fresh = createFakeGladys();
-  await fresh.publishDiscoveredDevices(buildDiscoveredDevices(fresh, config));
-  assert.equal(fresh.fake.discoveredDevices.length, DEVICE_BLUEPRINTS.length);
+test('purifiers (Home Assistant answers)', () => {
+  const core = parse('LAP-C401S-WJP', HOME_ASSISTANT.purifier);
+  assert.deepEqual(core.values, {
+    power: 1,
+    mode: { text: 'manual' },
+    fan_speed: 1,
+    pm25: 5,
+    filter_life: 99,
+    child_lock: 0,
+    display: 1,
+  });
+  assert.equal(core.state.airQuality, 1);
+
+  const vital = parse('LAP-V201S-WUS', HOME_ASSISTANT.purifierV2);
+  assert.equal(vital.values.fan_speed, 1, 'manualSpeedLevel, the motor being at 0');
+  assert.equal(vital.values.pm25, 5);
+  assert.equal(vital.values.child_lock, 0);
 });
 
-test('Gladys polls exactly the devices that implement onPoll', () => {
-  const frequencies = Object.values(DEVICE_POLL_FREQUENCIES);
-  for (const bp of DEVICE_BLUEPRINTS) {
-    const device = bp.buildDevice(gladys, config);
-    if (typeof bp.onPoll === 'function') {
-      assert.equal(device.should_poll, true, `${bp.key}: without should_poll, never polled`);
-      assert.ok(frequencies.includes(device.poll_frequency), `${bp.key}: invalid poll_frequency`);
-    } else {
-      assert.notEqual(device.should_poll, true, `${bp.key}: polled for nothing`);
-    }
-  }
+test('a purifier the device stopped: 255 is no speed (pyvesync)', () => {
+  const model = findModel('LAP-V201S-WEU');
+  const state = MODULES.purifier.parseState(model, {
+    powerSwitch: 0,
+    workMode: 'auto',
+    fanSpeedLevel: 255,
+    manualSpeedLevel: 3,
+  });
+  assert.equal(state.on, false);
+  assert.equal(state.fanLevel, undefined);
+  assert.equal(state.mode, 'auto');
 });
 
-test('the poller reads a device at the refresh interval of the config', async (t) => {
-  t.mock.timers.enable({ apis: ['Date'] });
-  const fresh = createFakeGladys();
-  const pollDevice = createPoller();
-  const plug = {
-    external_id: DEVICE_BLUEPRINTS.find((bp) => bp.key === 'plug').deviceExternalId(fresh),
-  };
-  const everyFiveMinutes = normalizeConfig({ poll_frequency: 300 });
+test('an unknown mode is not published', () => {
+  const model = findModel('Core400S');
+  const state = MODULES.purifier.parseState(model, { enabled: true, mode: 'turbo' });
+  assert.equal(state.mode, undefined);
+  assert.equal(MODULES.purifier.featureValues(state).mode, undefined);
+});
 
-  assert.equal(await pollDevice(fresh, plug, everyFiveMinutes), true, 'the first poll reads');
-  for (let minute = 1; minute < 5; minute += 1) {
-    t.mock.timers.tick(DEVICE_POLL_FREQUENCIES.EVERY_MINUTES);
-    assert.equal(
-      await pollDevice(fresh, plug, everyFiveMinutes),
-      false,
-      `skipped at ${minute} min`,
+test('classic humidifiers (pyvesync answers)', () => {
+  for (const key of [
+    'Classic200S',
+    'Classic300S',
+    'Dual200S',
+    'LUH-A602S-WUS',
+    'LUH-O451S-WEU',
+    'LUH-O451S-WUS',
+  ]) {
+    const { values } = fromPyvesync(key);
+    assert.deepEqual(
+      values,
+      {
+        power: 1,
+        humidity: 50,
+        target_humidity: { text: '60' },
+        mode: { text: 'manual' },
+        mist_level: 3,
+        water_tank: LIQUID_STATE.NORMAL,
+      },
+      key,
     );
   }
-  // Gladys' tick may land a little early: the read is still due.
-  t.mock.timers.tick(DEVICE_POLL_FREQUENCIES.EVERY_MINUTES - 50);
-  assert.equal(await pollDevice(fresh, plug, everyFiveMinutes), true, 'read again at 5 min');
 });
 
-test('the poller retries a failed read at the next poll', async (t) => {
-  t.mock.timers.enable({ apis: ['Date'] });
-  const pollDevice = createPoller();
-  const station = {
-    external_id: DEVICE_BLUEPRINTS.find((bp) => bp.key === 'weather-station').deviceExternalId(
-      gladys,
-    ),
-  };
-  t.mock.method(globalThis, 'fetch', async () => {
-    throw new Error('network down');
+test('V2 humidifiers (pyvesync answers)', () => {
+  for (const key of [
+    'LUH-A603S-WUS',
+    'LUH-M101S-WEUR',
+    'LUH-M101S-WUS',
+    'LEH-S601S',
+    'LEH-B381S',
+  ]) {
+    const { values } = fromPyvesync(key);
+    assert.deepEqual(
+      values,
+      {
+        power: 1,
+        humidity: 50,
+        target_humidity: { text: '60' },
+        mode: { text: 'manual' },
+        mist_level: 3,
+        water_tank: LIQUID_STATE.NORMAL,
+      },
+      key,
+    );
+  }
+});
+
+test('humidifiers (Home Assistant answers): empty tank, "humidity" mode', () => {
+  const classic = parse('Classic200S', HOME_ASSISTANT.humidifier);
+  assert.deepEqual(classic.values, {
+    power: 1,
+    humidity: 35,
+    target_humidity: { text: '40' },
+    mode: { text: 'manual' },
+    mist_level: 6,
+    water_tank: LIQUID_STATE.LOW,
   });
-  await assert.rejects(pollDevice(gladys, station, config), /network down/);
 
-  globalThis.fetch.mock.mockImplementation(async () => ({
-    ok: true,
-    json: async () => ({ current: { temperature_2m: 21.4, relative_humidity_2m: 55 } }),
-  }));
-  t.mock.timers.tick(DEVICE_POLL_FREQUENCIES.EVERY_MINUTES);
-  assert.equal(await pollDevice(gladys, station, config), true, 'not delayed by the failure');
-  assert.equal(gladys.fake.lastState(`${station.external_id}:temperature`), 21.4);
+  const superior = parse('LEH-S601S-WUS', HOME_ASSISTANT.humidifier6000s);
+  assert.deepEqual(superior.values.mode, { text: 'humidity' });
+  assert.equal(superior.values.humidity, 36);
+  assert.deepEqual(superior.values.target_humidity, { text: '40' });
+  assert.equal(superior.values.water_tank, LIQUID_STATE.NORMAL);
 });
 
-test('the poller ignores a device that has nothing to poll', async () => {
-  const pollDevice = createPoller();
-  const switchId = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'switch').deviceExternalId(gladys);
-  assert.equal(await pollDevice(gladys, { external_id: switchId }, config), false);
-  assert.equal(await pollDevice(gladys, { external_id: 'does-not-exist' }, config), false);
+test('the API words of the modes are mapped back to stable keys', () => {
+  const lv600 = findModel('LUH-A603S-WUS');
+  assert.equal(MODULES.humidifier.parseState(lv600, { workMode: 'humidity' }).mode, 'auto');
+  const superior = findModel('LEH-S601S-WEUR');
+  assert.equal(MODULES.humidifier.parseState(superior, { workMode: 'autoPro' }).mode, 'auto');
+  assert.equal(MODULES.humidifier.parseState(superior, { workMode: 'humidity' }).mode, 'humidity');
 });
 
-test('an idle plug publishes its 0 W once, then only as a heartbeat', async (t) => {
-  t.mock.timers.enable({ apis: ['Date'] });
-  const fresh = createFakeGladys();
-  const plug = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'plug');
-  await plug.onPoll(fresh, config);
-  await plug.onPoll(fresh, config);
-  assert.equal(fresh.fake.states.length, 1, 'an unchanged value is not sent again');
-  t.mock.timers.tick(30 * 60 * 1000);
-  await plug.onPoll(fresh, config);
-  assert.equal(fresh.fake.states.length, 2, 're-sent after 30 minutes');
-});
-
-test('device external_ids are unique across the catalog', () => {
-  const devices = buildDiscoveredDevices(gladys, config);
-  const ids = devices.map((d) => d.external_id);
-  assert.equal(new Set(ids).size, ids.length, 'no two devices may share an external_id');
-});
-
-test('findBlueprintByDevice routes an external_id back to its owner blueprint', () => {
-  for (const bp of DEVICE_BLUEPRINTS) {
-    const external_id = bp.deviceExternalId(gladys);
-    const found = findBlueprintByDevice(gladys, { external_id });
-    assert.equal(found, bp);
-  }
-});
-
-test('findBlueprintByDevice returns undefined for an unknown device', () => {
-  const found = findBlueprintByDevice(gladys, { external_id: 'does-not-exist' });
-  assert.equal(found, undefined);
-});
-
-test('manifest action keys are unique across blueprints', () => {
-  const keys = DEVICE_BLUEPRINTS.flatMap((bp) => Object.keys(bp.actions ?? {}));
-  assert.equal(new Set(keys).size, keys.length, 'no two blueprints may register the same action');
-});
-
-test('the camera declares a camera/image feature', () => {
-  const cameraBlueprint = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'camera');
-  const device = cameraBlueprint.buildDevice(gladys, config);
-  const imageFeature = device.features.find((f) => f.category === DEVICE_FEATURE_CATEGORIES.CAMERA);
-  assert.ok(imageFeature, 'the camera must carry a camera feature');
-  assert.equal(imageFeature.type, DEVICE_FEATURE_TYPES.CAMERA.IMAGE);
-  assert.equal(imageFeature.read_only, true);
-});
-
-test('onGetImage resolves a base64 JPEG under the 150 KB limit', async () => {
-  const cameraBlueprint = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'camera');
-  const image = await cameraBlueprint.onGetImage(gladys, {
-    device: { external_id: cameraBlueprint.deviceExternalId(gladys) },
-    config,
+test('a target of 0 (never set) is not published', () => {
+  const model = findModel('Classic300S');
+  const state = MODULES.humidifier.parseState(model, {
+    configuration: { auto_target_humidity: 0 },
   });
-  assert.match(image, /^image\/jpg;base64,/);
-  assert.ok(image.length <= 150 * 1024, 'the image must stay under 150 KB');
+  assert.equal(state.targetHumidity, undefined);
 });
 
-test('buildTransportEntries reports one valid entry per dual-channel device', () => {
-  const entries = buildTransportEntries(gladys, config);
-  assert.ok(entries.length > 0, 'the demo plug reports its transport');
-  const validValues = Object.values(DEVICE_TRANSPORTS);
-  for (const entry of entries) {
-    assert.ok(entry.external_id, 'each entry targets a device external_id');
-    assert.ok(validValues.includes(entry.transport), `invalid transport: ${entry.transport}`);
-  }
-});
-
-test('the demo plug honors the GLADYS_PREFER_LOCAL preference', () => {
-  const local = buildTransportEntries(gladys, normalizeConfig({ GLADYS_PREFER_LOCAL: true }));
-  const cloud = buildTransportEntries(gladys, normalizeConfig({ GLADYS_PREFER_LOCAL: false }));
-  const plugId = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'plug').deviceExternalId(gladys);
-  assert.equal(local.find((e) => e.external_id === plugId).transport, DEVICE_TRANSPORTS.LOCAL);
-  assert.equal(cloud.find((e) => e.external_id === plugId).transport, DEVICE_TRANSPORTS.CLOUD);
-});
-
-test('nominal transport entries never carry a leftover degraded flag', () => {
-  const entries = buildTransportEntries(gladys, config);
-  for (const entry of entries) {
-    assert.equal(entry.degraded, undefined, 'nominal entries must clear the degraded state');
-  }
-});
-
-test('the plug reports a degraded cloud fallback when the LAN session is refused', () => {
-  const plugId = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'plug').deviceExternalId(gladys);
-  simulateLanSession(false);
-  try {
-    const entries = buildTransportEntries(gladys, normalizeConfig({ GLADYS_PREFER_LOCAL: true }));
-    const entry = entries.find((e) => e.external_id === plugId);
-    assert.equal(entry.transport, DEVICE_TRANSPORTS.CLOUD, 'falls back to cloud');
-    assert.equal(entry.degraded, true, 'the fallback is flagged degraded');
-    assert.ok(entry.message.en, 'the reason carries at least the mandatory `en` text');
-    assert.ok(entry.message.en.length <= 200, 'tooltip messages are capped at 200 characters');
-  } finally {
-    simulateLanSession(true);
-  }
-});
-
-test('identifyDevice signals a device that implements identify', async () => {
-  const lightId = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'light').deviceExternalId(gladys);
-  const message = await identifyDevice(gladys, lightId, config);
-  assert.match(message.en, /signalling/);
-  assert.ok(message.fr, 'the message is multi-language');
-});
-
-test('identifyDevice explains when the device has no way to signal itself', async () => {
-  const weatherId = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'weather-station').deviceExternalId(
-    gladys,
-  );
-  const message = await identifyDevice(gladys, weatherId, config);
-  assert.match(message.en, /no way to signal/);
-});
-
-test('the test_weather action returns a multi-language message', async () => {
-  const realFetch = globalThis.fetch;
-  globalThis.fetch = async () => ({
-    ok: true,
-    json: async () => ({ current: { temperature_2m: 21.4, relative_humidity_2m: 55 } }),
+test('outlets (pyvesync answers): numbers sent as strings are parsed', () => {
+  assert.deepEqual(fromPyvesync('ESW03').values, {
+    power: 1,
+    active_power: 20,
+    voltage: 120,
+    energy_today: 10,
   });
-  try {
-    const weatherStation = DEVICE_BLUEPRINTS.find((bp) => bp.key === 'weather-station');
-    const message = await weatherStation.actions.test_weather(gladys, { fields: {}, config });
-    assert.match(message.en, /21\.4/);
-    assert.match(message.fr, /21\.4/);
-  } finally {
-    globalThis.fetch = realFetch;
+  assert.deepEqual(fromPyvesync('ESW15-USA').values, {
+    power: 1,
+    active_power: 20,
+    voltage: 120,
+    energy_today: 10,
+  });
+  assert.deepEqual(fromPyvesync('ESW10-USA').values, {
+    power: 1,
+    active_power: undefined,
+    voltage: undefined,
+    energy_today: undefined,
+  });
+  const offline = parse('ESW01-EU', {
+    result: { deviceStatus: 'off', connectionStatus: 'offline', power: '0', voltage: '0' },
+  });
+  assert.equal(offline.state.offline, true);
+});
+
+test('every model has its modes labelled and a level range', () => {
+  for (const model of MODELS) {
+    if (model.kind === 'outlet') {
+      continue;
+    }
+    assert.ok(modeKeys(model).length >= 2, model.name);
+    assert.ok((model.levels ?? model.mistLevels) >= 2, model.name);
   }
+  // Every deviceType belongs to one model only.
+  const types = MODELS.flatMap((model) => model.types);
+  assert.equal(new Set(types).size, types.length);
+});
+
+test('commands refuse what the device does not accept, without a request', async () => {
+  const requests = [];
+  const client = { bypassV2: async (...args) => requests.push(args) };
+  const purifier = findModel('Core200S');
+  const context = { client, device: { cid: 'x' }, model: purifier, state: {} };
+  await assert.rejects(MODULES.purifier.command(context, 'mode', 'auto'), {
+    kind: 'invalid_value',
+  });
+  await assert.rejects(MODULES.purifier.command(context, 'fan_speed', 4), {
+    kind: 'invalid_value',
+  });
+  const humidifier = findModel('Classic300S');
+  const hContext = { client, device: { cid: 'y' }, model: humidifier, state: {} };
+  await assert.rejects(MODULES.humidifier.command(hContext, 'target_humidity', '85'), {
+    kind: 'invalid_value',
+  });
+  await assert.rejects(MODULES.humidifier.command(hContext, 'mist_level', 10), {
+    kind: 'invalid_value',
+  });
+  assert.equal(requests.length, 0);
+
+  // "45 %" typed in a scene is 45.
+  await MODULES.humidifier.command(hContext, 'target_humidity', '45 %');
+  assert.deepEqual(requests[0].slice(1), ['setTargetHumidity', { target_humidity: 45 }]);
 });

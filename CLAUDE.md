@@ -17,7 +17,7 @@ its only runtime dependency. It started from the official JavaScript template.
 npm install
 npm test                                  # node --test, the built-in runner
 node --test test/devices.test.js          # one file
-node --test --test-name-pattern "plug"    # tests whose name matches
+node --test --test-name-pattern "filter"  # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
@@ -31,16 +31,30 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: createApp() then connect()
+src/app.js                        the Gladys handlers, all routed to the hub (testable wiring)
+src/hub.js                        one VeSync account: device list, own polling timer, states,
+                                  commands, scene events, transports, connection status
+src/devices/index.js              registry: VeSync device → Gladys device, states of a device
+src/devices/purifier.js           features, parsing (core / v2 APIs) and commands of the purifiers
+src/devices/humidifier.js         same for the humidifiers (classic / v2 APIs)
+src/devices/outlet.js             same for the plugs (v1 / esw10 APIs)
+src/devices/common.js             loose value parsing (true/1/"on", numbers as strings)
+src/vesync/client.js              VeSync cloud client: login, device list, bypassV2, v1 calls
+src/vesync/models.js              supported deviceTypes → model, API family, modes, levels
+src/vesync/errors.js              VeSync result codes → error kinds
+src/vesync/session.js             the session file in /data
+src/scenes.js                     scene triggers (manifest `scene_triggers`)
+src/widgets.js                    "air_quality" dashboard widget (manifest `widgets`)
+src/i18n.js                       every text, in en / fr / de / es
+src/issues.js                     repeated failures logged once
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+scripts/probe.mjs                 read-only check of a real account, nothing sensitive printed
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (same sections)
+test/                             node --test, against the SDK's fake Gladys and a fake VeSync
+test/fixtures/pyvesync/           pyvesync's recorded answers and requests (MIT)
+test/fixtures/home-assistant/     Home Assistant's vesync test answers (Apache-2.0)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +84,10 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in four languages (English, French, German with
+  "du", Spanish with "usted"): action messages, manifest texts, feature names,
+  widget texts, and `docs/en.md`, `fr.md`, `de.md`, `es.md` with the same
+  sections. `test/i18n.test.js` checks it.
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -198,6 +214,24 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - **Les clés de widgets, de déclencheurs et d'actions sont figées une fois publiées.**
 - `gladys_version` `>=5.1.0` dès qu'il y a widgets, déclencheurs ou actions de scène.
 
+**Relevés sur gladys-vesync (13/10/2026, front 5.2.1)**
+
+- `fan/mode` est rendu par `FanModeDeviceFeature`, qui **ignore `supported_options`** : il propose
+  toujours arrêt/bas/moyen/haut/auto. Les modes propres à un fabricant (nuit, animaux, turbo) passent
+  par un `text/select` (clés stables en valeur, libellés dans la langue de la config).
+- Il n'existe **aucune consigne d'humidité** : `SetpointDeviceFeature` ne sert que thermostat,
+  climatisation, chauffe-eau et intensité cible. Une humidité cible pilotable passe par un
+  `text/select` (une option par pourcent).
+- L'action de scène « Contrôler un appareil » accepte les valeurs texte d'un `text/select`
+  (`DeviceSetValue.jsx`, 5.2.1).
+- `level-sensor/liquid-state` : 0 = Faible/Low/Niedrig/Bajo, 1 = Normal, 2 = Élevé ; il convient à un
+  réservoir vide.
+- Dans le SDK, les capteurs génériques sont sous `DEVICE_FEATURE_TYPES.SENSOR` (`DECIMAL` pour PM2,5
+  et humidité) et la durée de vie d'un filtre sous `FILTER_MONITORING.FILTER_LIFE_REMAINING` : il n'y
+  a pas de clé `PM25_SENSOR` ni `HEPA_FILTER_MONITORING` dans `DEVICE_FEATURE_TYPES`.
+- Le garde-fou du tutoiement allemand attrape aussi « Sie » en début de phrase quand il veut dire
+  « elle » : reformuler (« Die Integration… »), ne pas affaiblir le test.
+
 ## Store
 
 - Validateur officiel, depuis la racine : `npx -y github:GladysAssistant/integration-store .`
@@ -233,3 +267,38 @@ long, et sur un « Sie »/« Ihr… » de politesse en allemand. Le store exige 
 - Docs `en`, `fr`, `de`, `es` avec les mêmes sections.
 - Chauffe, ouverture, sécurité : ne rien rendre pilotable « comme un thermostat » ou par un assistant
   vocal quand une erreur serait dangereuse (leçon d'OctoPrint).
+
+## VeSync (propre à ce dépôt)
+
+- **Protocole porté de pyvesync** (MIT, `webdjoe/pyvesync`) : connexion en deux temps
+  (`/globalPlatform/api/accountAuth/v1/authByPWDOrOTM` avec l'e-mail et le **MD5** du mot de passe →
+  `authorizeCode`, puis `/user/api/accountManage/v1/loginByAuthorizeCode4Vesync` → `token`,
+  `accountID`, `countryCode`). Serveurs `smartapi.vesync.eu` et `smartapi.vesync.com`. Un compte de
+  l'autre région répond **-11260022** avec `bizToken`, `currentRegion`, `countryCode` : on refait
+  l'échange sur ce serveur avec `bizToken` et `regionChange: 'lastRegion'`, une fois.
+- Les champs d'identité (`appVersion` 5.6.60, `phoneBrand` « pyvesync », `appID`…) sont ceux que
+  pyvesync envoie : ce sont ceux que le cloud est connu pour accepter. `test/client.test.js` compare
+  **chaque requête** (méthode, en-têtes, corps) à celles que pyvesync enregistre dans ses tests
+  (`test/fixtures/pyvesync/requests/`) : ne pas changer un champ sans raison vérifiée.
+- Toute réponse est un HTTP 200 avec un `code` (0 = succès). Un code inconnu se lit sans ses trois
+  derniers chiffres (-11201022 → -11201000, mot de passe refusé). `bypassV2` a **deux** codes : celui
+  de l'enveloppe et celui de `result` (appareil hors ligne : -11300030 dans `result.code`).
+  -11001xxx = jeton expiré : on se reconnecte une fois et on rejoue la requête.
+- Un **mot de passe refusé arrête tout** jusqu'à la prochaine configuration (risque de blocage du
+  compte) ; « Tester la connexion » réessaie, c'est un geste de l'utilisateur.
+- **Familles d'API** (`src/vesync/models.js`) : purificateurs `core` (snake_case : `enabled`,
+  `level`, `air_quality_value`) et `v2` (camelCase : `powerSwitch`, `manualSpeedLevel`, `PM25`) ;
+  humidificateurs `classic` et `v2` ; prises `v1` (`deviceDetail`/`deviceStatus`, puissance et
+  tension parfois en **chaînes**) et `esw10`. Un mode est une clé stable mappée au mot de l'API :
+  `auto` vaut `humidity` sur le LV600S A603S et `autoPro` sur le Superior 6000S et le Sprout.
+- Purificateur : il n'existe pas de commande « mode manuel » : on fixe une vitesse (`setLevel`),
+  comme pyvesync. `fanSpeedLevel` à 255 veut dire arrêté.
+- L'OasisMist 1000S envoie son niveau de brume sous la méthode `virtualLevel` (pas
+  `setVirtualLevel`) : repris tel quel de pyvesync, à confirmer sur un vrai appareil.
+- `energy` d'une prise 10 A / 15 A est l'**énergie du jour** (Home Assistant : « Energy use
+  today »), remise à zéro chaque jour : `switch/energy`, pas un index.
+- Le jeton, l'`accountID`, la région, le pays, un SHA-256 de l'e-mail et le `terminalId` vivent dans
+  `/data/vesync-session.json` (0600). Jamais l'e-mail ni le mot de passe.
+- Aucune documentation officielle ni quota publié : une lecture par minute et par appareil (rythme de
+  Home Assistant), la liste des appareils toutes les 30 min. Non vérifié sur le vrai service depuis la
+  session de développement : `scripts/probe.mjs` le fait, en lecture seule.
