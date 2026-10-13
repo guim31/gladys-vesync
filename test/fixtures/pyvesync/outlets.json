@@ -1,0 +1,158 @@
+{
+  "BSDOG01": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "channelNum": 1,
+        "currentUpperThreshold": 16,
+        "electricalEnergy": 10,
+        "powerSwitch_1": 1,
+        "protectionStatus": "normal",
+        "realTimePower": 20,
+        "realTimeVoltage": 120,
+        "voltageUnderThreshold": 75,
+        "voltageUpperThreshold": 280
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "ESO15-TB": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "activeTime": 1,
+      "connectionStatus": "online",
+      "deviceImg": "",
+      "deviceName": "Etekcity Outdoor Plug",
+      "deviceStatus": "on",
+      "energy": 10,
+      "power": 20,
+      "subDevices": [
+        {
+          "defaultName": "Socket A",
+          "subDeviceImg": "",
+          "subDeviceName": "Socket A",
+          "subDeviceNo": 1,
+          "subDeviceStatus": "on"
+        },
+        {
+          "defaultName": "Socket B",
+          "subDeviceImg": "",
+          "subDeviceName": "Socket B",
+          "subDeviceNo": 2,
+          "subDeviceStatus": "on"
+        }
+      ],
+      "voltage": 120
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "ESW03": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "activeTime": 1,
+      "connectionStatus": "online",
+      "deviceName": "ESW03",
+      "deviceStatus": "on",
+      "energy": 10,
+      "power": "20",
+      "voltage": "120"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "ESW10-USA": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "enabled": true,
+        "id": 0
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "ESW15-USA": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "activeTime": 1,
+      "connectionStatus": "online",
+      "deviceImg": "https://image.vesync.com/defaultImages/deviceDefaultImages/15aoutletnightlight_240.png",
+      "deviceName": "Etekcity 15A WiFi Outlet US/CA",
+      "deviceStatus": "on",
+      "energy": 10,
+      "nightLightAutomode": "auto",
+      "nightLightBrightness": 50,
+      "nightLightStatus": "on",
+      "power": 20,
+      "voltage": 120
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "WHOGPLUG": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "current": 0.5,
+        "enabled": true,
+        "energy": 10,
+        "highestVoltage": 240,
+        "power": 20,
+        "voltage": 120,
+        "voltagePtStatus": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "WYLDR16A1081": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "channelNum": 1,
+        "currentUpperThreshold": 16,
+        "electricalEnergy": 10,
+        "powerSwitch_1": 1,
+        "protectionStatus": "normal",
+        "realTimePower": 20,
+        "realTimeVoltage": 120,
+        "voltageUnderThreshold": 75,
+        "voltageUpperThreshold": 280
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "wifi-switch-1.3": {
+    "activeTime": 1,
+    "deviceImg": "https://image.vesync.com/defaultImages/deviceDefaultImages/7aoutlet_240.png",
+    "deviceStatus": "on",
+    "energy": 10,
+    "power": "1000:1000",
+    "voltage": "78000:78000"
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "Classic200S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "automatic_stop_reach_target": false,
+        "configuration": {
+          "auto_target_humidity": 60,
+          "automatic_stop": false,
+          "indicator_light_switch": true
+        },
+        "enabled": true,
+        "humidity": 50,
+        "humidity_high": false,
+        "indicator_light_switch": true,
+        "mist_level": 3,
+        "mist_virtual_level": 3,
+        "mode": "manual",
+        "water_lacks": false,
+        "water_tank_lifted": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "Classic300S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "automatic_stop_reach_target": false,
+        "configuration": {
+          "auto_target_humidity": 60,
+          "automatic_stop": false,
+          "display": true
+        },
+        "display": true,
+        "enabled": true,
+        "humidity": 50,
+        "humidity_high": false,
+        "mist_level": 3,
+        "mist_virtual_level": 3,
+        "mode": "manual",
+        "night_light_brightness": 0,
+        "water_lacks": false,
+        "water_tank_lifted": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "Dual200S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "automatic_stop_reach_target": false,
+        "configuration": {
+          "auto_target_humidity": 60,
+          "automatic_stop": false,
+          "display": true
+        },
+        "display": true,
+        "enabled": true,
+        "humidity": 50,
+        "humidity_high": false,
+        "mist_level": 3,
+        "mist_virtual_level": 3,
+        "mode": "manual",
+        "night_light_brightness": 0,
+        "water_lacks": false,
+        "water_tank_lifted": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LEH-B381S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "afterDryLastHumidityTime": 1764651910,
+        "autoModePreference": 1,
+        "autoPreference": 4,
+        "autoStopState": 0,
+        "autoStopSwitch": 0,
+        "breathingLamp": {
+          "breathingLampSwitch": 0,
+          "brightnessEnd": 50,
+          "brightnessStart": 0,
+          "colorTemperature": 4000,
+          "timeInterval": 10
+        },
+        "childLockSwitch": 0,
+        "dryingMode": {
+          "autoDryingSwitch": "on",
+          "dryingLevel": 1,
+          "dryingRemain": 0,
+          "dryingState": 0
+        },
+        "dumpedState": 0,
+        "filterLifePercent": 85,
+        "guardingInfo": {
+          "guarding": 1,
+          "remainTS": 0
+        },
+        "hepaFilterLifePercent": 78,
+        "humidity": 50,
+        "lampSwitch": 0,
+        "lampType": 1,
+        "lastDryingCompletedTime": 1764685402,
+        "mistLevel": 3,
+        "nightLight": {
+          "brightness": 0,
+          "colorTemperature": 4000,
+          "nightLightSwitch": 0
+        },
+        "powerSwitch": 1,
+        "roomSize": 242,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "sensorContent": {
+          "selfSenorBattery": 100,
+          "selfSensorMac": "02:00:00:00:00:01",
+          "selfSensorStatus": "on"
+        },
+        "supportLampAct": 1,
+        "targetHumidity": 60,
+        "temperature": 700,
+        "virtualLevel": 3,
+        "waterLacksState": 0,
+        "waterShortageDryingSwitch": 1,
+        "waterTankLifted": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LEH-S601S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "autoPreference": 1,
+        "autoStopState": 0,
+        "autoStopSwitch": 0,
+        "childLockSwitch": 0,
+        "dryingMode": {
+          "autoDryingSwitch": 1,
+          "dryingLevel": 1,
+          "dryingRemain": 7200,
+          "dryingState": 0
+        },
+        "errorCode": 0,
+        "filterLifePercent": 85,
+        "humidity": 50,
+        "mistLevel": 3,
+        "powerSwitch": 1,
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "targetHumidity": 60,
+        "temperature": 700,
+        "timerRemain": 0,
+        "virtualLevel": 3,
+        "waterLacksState": 0,
+        "waterTankLifted": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LUH-A602S-WUS": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "automatic_stop_reach_target": false,
+        "configuration": {
+          "auto_target_humidity": 60,
+          "automatic_stop": false,
+          "display": true
+        },
+        "display": true,
+        "enabled": true,
+        "humidity": 50,
+        "humidity_high": false,
+        "mist_level": 3,
+        "mist_virtual_level": 3,
+        "mode": "manual",
+        "night_light_brightness": 0,
+        "warm_mist_enabled": true,
+        "warm_mist_level": 1,
+        "water_lacks": false,
+        "water_tank_lifted": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LUH-A603S-WUS": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "autoStopState": 0,
+        "autoStopSwitch": 0,
+        "errorCode": 0,
+        "humidity": 50,
+        "mistLevel": 3,
+        "powerSwitch": 1,
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "targetHumidity": 60,
+        "timerRemain": 0,
+        "totalWorkTime": 0,
+        "virtualLevel": 3,
+        "warmLevel": 1,
+        "warmPower": true,
+        "waterLacksState": 0,
+        "waterTankLifted": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LUH-M101S-WEUR": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "autoStopState": 0,
+        "autoStopSwitch": 0,
+        "errorCode": 0,
+        "humidity": 50,
+        "mistLevel": 3,
+        "nightLight": {
+          "brightness": 0,
+          "nightLightSwitch": 0
+        },
+        "powerSwitch": 1,
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "targetHumidity": 60,
+        "timerRemain": 0,
+        "virtualLevel": 3,
+        "waterLacksState": 0,
+        "waterTankLifted": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LUH-M101S-WUS": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "autoStopState": 0,
+        "autoStopSwitch": 0,
+        "errorCode": 0,
+        "humidity": 50,
+        "mistLevel": 3,
+        "powerSwitch": 1,
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "targetHumidity": 60,
+        "timerRemain": 0,
+        "virtualLevel": 3,
+        "waterLacksState": 0,
+        "waterTankLifted": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LUH-O451S-WEU": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "automatic_stop_reach_target": false,
+        "configuration": {
+          "auto_target_humidity": 60,
+          "automatic_stop": false,
+          "display": true
+        },
+        "display": true,
+        "enabled": true,
+        "extension": {
+          "schedule_count": 0,
+          "timer_remain": 0
+        },
+        "humidity": 50,
+        "humidity_high": false,
+        "mist_level": 3,
+        "mist_virtual_level": 3,
+        "mode": "manual",
+        "rgbNightLight": {
+          "action": "on",
+          "blue": 0,
+          "brightness": 100,
+          "colorMode": "color",
+          "colorSliderLocation": 0,
+          "green": 50,
+          "red": 252,
+          "speed": 0
+        },
+        "warm_enabled": true,
+        "warm_level": 1,
+        "water_lacks": false,
+        "water_tank_lifted": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LUH-O451S-WUS": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "automatic_stop_reach_target": false,
+        "configuration": {
+          "auto_target_humidity": 60,
+          "automatic_stop": false,
+          "display": true
+        },
+        "display": true,
+        "enabled": true,
+        "extension": {
+          "schedule_count": 0,
+          "timer_remain": 0
+        },
+        "humidity": 50,
+        "humidity_high": false,
+        "mist_level": 3,
+        "mist_virtual_level": 3,
+        "mode": "manual",
+        "warm_enabled": true,
+        "warm_level": 1,
+        "water_lacks": false,
+        "water_tank_lifted": false
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  }
+}

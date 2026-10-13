@@ -1,0 +1,371 @@
+{
+  "Core200S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "child_lock": true,
+        "configuration": {
+          "display": true,
+          "display_forever": true
+        },
+        "device_error_code": 0,
+        "display": true,
+        "enabled": true,
+        "filter_life": 80,
+        "level": 1,
+        "mode": "manual",
+        "night_light": "on"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "Core300S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "air_quality": 2,
+        "air_quality_value": 3,
+        "child_lock": true,
+        "configuration": {
+          "auto_preference": {
+            "room_size": 0,
+            "type": "default"
+          },
+          "display": true,
+          "display_forever": true
+        },
+        "device_error_code": 0,
+        "display": true,
+        "enabled": true,
+        "extension": {
+          "schedule_count": 0,
+          "timer_remain": 0
+        },
+        "filter_life": 80,
+        "level": 1,
+        "mode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "Core400S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "air_quality": 2,
+        "air_quality_value": 3,
+        "child_lock": true,
+        "configuration": {
+          "auto_preference": {
+            "room_size": 0,
+            "type": "default"
+          },
+          "display": true,
+          "display_forever": true
+        },
+        "device_error_code": 0,
+        "display": true,
+        "enabled": true,
+        "extension": {
+          "schedule_count": 0,
+          "timer_remain": 0
+        },
+        "filter_life": 80,
+        "level": 1,
+        "mode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "Core600S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "air_quality": 2,
+        "air_quality_value": 3,
+        "child_lock": true,
+        "configuration": {
+          "auto_preference": {
+            "room_size": 0,
+            "type": "default"
+          },
+          "display": true,
+          "display_forever": true
+        },
+        "device_error_code": 0,
+        "display": true,
+        "enabled": true,
+        "extension": {
+          "schedule_count": 0,
+          "timer_remain": 0
+        },
+        "filter_life": 80,
+        "level": 1,
+        "mode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "EL551S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "AQLevel": 2,
+        "AQPercent": 75,
+        "PM1": 10,
+        "PM10": 5,
+        "PM25": 3,
+        "autoPreference": {
+          "autoPreferenceType": "default",
+          "roomSize": 0
+        },
+        "childLockSwitch": 1,
+        "ecoModeRunTime": 0,
+        "efficientModeTimeRemain": 0,
+        "environmentLightState": 1,
+        "errorCode": 0,
+        "fanRotateAngle": 45,
+        "fanSpeedLevel": 1,
+        "filterLifePercent": 80,
+        "filterOpenState": 0,
+        "lightDetectionSwitch": 0,
+        "manualSpeedLevel": 2,
+        "powerSwitch": 1,
+        "routine": {
+          "routineType": "normal",
+          "runSeconds": 0
+        },
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "timerRemain": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LAP-B851S-WUS": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "AQI": 75,
+        "AQLevel": 1,
+        "CO2": 669,
+        "PM1": 10,
+        "PM10": 5,
+        "PM25": 3,
+        "VOC": 120,
+        "autoPreference": {
+          "autoPreferenceType": "default",
+          "roomSize": 630
+        },
+        "breathingLamp": {
+          "breathingLampSwitch": 1,
+          "brightnessEnd": 90,
+          "brightnessStart": 10,
+          "colorTemperature": 6500,
+          "timeInterval": 5
+        },
+        "childLockSwitch": 1,
+        "dumpedState": 0,
+        "efficientModeTimeRemain": 1182,
+        "errorCode": 0,
+        "fanSpeedLevel": 1,
+        "guardingInfo": {
+          "guarding": 0,
+          "remainTS": 100
+        },
+        "humidity": 50,
+        "lampSwitch": 1,
+        "lampType": 0,
+        "manualSpeedLevel": 2,
+        "nightLight": {
+          "brightness": 100,
+          "colorTemperature": 6500,
+          "nightLightSwitch": 1
+        },
+        "powerSwitch": 1,
+        "roomSize": 242,
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "temperature": 791,
+        "timerRemain": 0,
+        "whiteNoiseInfo": {
+          "countDown": 1800,
+          "countingDown": 1800,
+          "downloadStatus": 2,
+          "playStatus": 0,
+          "soundId": 100006
+        },
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LAP-V102S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "AQLevel": 2,
+        "PM25": 3,
+        "autoPreference": {
+          "autoPreferenceType": "default",
+          "roomSize": 600
+        },
+        "childLockSwitch": 1,
+        "efficientModeTimeRemain": 0,
+        "environmentLightState": 1,
+        "errorCode": 0,
+        "fanSpeedLevel": 1,
+        "filterLifePercent": 80,
+        "lightDetectionSwitch": 0,
+        "manualSpeedLevel": 2,
+        "powerSwitch": 1,
+        "scheduleCount": 0,
+        "screenState": 1,
+        "screenSwitch": 1,
+        "timerRemain": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LAP-V201S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "AQLevel": 2,
+        "PM25": 3,
+        "autoPreference": {
+          "autoPreferenceType": "default",
+          "roomSize": 0
+        },
+        "childLockSwitch": "on",
+        "efficientModeTimeRemain": 0,
+        "environmentLightState": true,
+        "errorCode": 0,
+        "fanSpeedLevel": 1,
+        "filterLifePercent": 80,
+        "lightDetectionSwitch": false,
+        "manualSpeedLevel": 2,
+        "powerSwitch": 1,
+        "scheduleCount": 0,
+        "screenState": "on",
+        "screenSwitch": "on",
+        "sleepPreference": {
+          "afterWakeUpFanSpeedLevel": 1,
+          "afterWakeUpPowerSwitch": 1,
+          "afterWakeUpWorkMode": "auto",
+          "cleaningBeforeBedMinutes": 5,
+          "cleaningBeforeBedSpeedLevel": 3,
+          "cleaningBeforeBedSwitch": 1,
+          "duringSleepMinutes": 480,
+          "duringSleepSpeedLevel": 5,
+          "sleepPreferenceType": "default",
+          "whiteNoiseSleepAidMinutes": 45,
+          "whiteNoiseSleepAidSpeedLevel": 1,
+          "whiteNoiseSleepAidSwitch": 1
+        },
+        "timerRemain": 0,
+        "workMode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LV-PUR131S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "activeTime": 1,
+      "airQuality": "good",
+      "childLock": "on",
+      "connectionStatus": "online",
+      "currentFirmVersion": "2.0.58",
+      "deviceImg": "https://image.vesync.com/defaultImages/deviceDefaultImages/airpurifier131_240.png",
+      "deviceName": "Levoit 131S Air Purifier",
+      "deviceStatus": "on",
+      "filterLife": {
+        "change": false,
+        "percent": 80,
+        "useHour": 3520
+      },
+      "level": 1,
+      "levelNew": 2,
+      "mode": "manual",
+      "schedule": null,
+      "scheduleCount": 0,
+      "screenStatus": "on",
+      "timer": null
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  },
+  "LV-RH131S": {
+    "code": 0,
+    "module": null,
+    "msg": null,
+    "result": {
+      "code": 0,
+      "result": {
+        "air_quality": 1,
+        "buzzer": true,
+        "child_lock": "on",
+        "configuration": {},
+        "display": "on",
+        "enabled": true,
+        "extension": {
+          "schedule_count": 0,
+          "timer_remain": 0
+        },
+        "filter_life": 80,
+        "level": 1,
+        "mode": "manual"
+      },
+      "traceId": "TRACE_ID"
+    },
+    "stacktrace": null,
+    "traceId": "TRACE_ID"
+  }
+}

@@ -1,177 +1,325 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "VeSync (Levoit)",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Levoit air purifiers and humidifiers, Etekcity plugs, through the VeSync cloud.",
+    "fr": "Purificateurs et humidificateurs Levoit, prises Etekcity, via le cloud VeSync.",
+    "de": "Levoit-Luftreiniger und -Luftbefeuchter, Etekcity-Stecker über die VeSync-Cloud.",
+    "es": "Purificadores y humidificadores Levoit, enchufes Etekcity, a través de la nube VeSync."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-vesync:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-vesync/main/cover.png",
+  "categories": ["environment", "climate"],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your VeSync account",
+        "fr": "Votre compte VeSync",
+        "de": "Dein VeSync-Konto",
+        "es": "Su cuenta VeSync"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "Enter the e-mail and password of the VeSync app, where your Levoit and Etekcity devices are set up. Then click Test the connection, and add the devices from the Discover tab. Not affiliated with VeSync, Levoit or Etekcity.",
+        "fr": "Saisissez l'e-mail et le mot de passe de l'application VeSync, où vos appareils Levoit et Etekcity sont installés. Cliquez ensuite sur Tester la connexion, puis ajoutez les appareils depuis l'onglet Découverte. Sans lien avec VeSync, Levoit ou Etekcity.",
+        "de": "Gib die E-Mail und das Passwort der VeSync-App ein, in der deine Levoit- und Etekcity-Geräte eingerichtet sind. Klicke dann auf Verbindung testen und füge die Geräte im Tab „Entdecken“ hinzu. Nicht mit VeSync, Levoit oder Etekcity verbunden.",
+        "es": "Introduzca el correo y la contraseña de la aplicación VeSync, donde están configurados sus dispositivos Levoit y Etekcity. Después pulse Probar la conexión y añada los dispositivos desde la pestaña Descubrir. Sin relación con VeSync, Levoit ni Etekcity."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-vesync/blob/main/docs/en.md",
+          "label": {
+            "en": "Setup guide",
+            "fr": "Guide d'installation",
+            "de": "Installationsanleitung",
+            "es": "Guía de instalación"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "email",
+      "type": "string",
+      "label": {
+        "en": "VeSync e-mail",
+        "fr": "E-mail VeSync",
+        "de": "VeSync-E-Mail",
+        "es": "Correo de VeSync"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
+      "placeholder": {
+        "en": "e.g. name@example.com",
+        "fr": "ex. nom@example.com",
+        "de": "z. B. name@example.com",
+        "es": "p. ej. nombre@example.com"
+      },
+      "required": true
     },
     {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "VeSync password",
+        "fr": "Mot de passe VeSync",
+        "de": "VeSync-Passwort",
+        "es": "Contraseña de VeSync"
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
+      "required": true
     },
     {
-      "key": "unit",
+      "key": "region",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "label": {
+        "en": "Account region",
+        "fr": "Région du compte",
+        "de": "Region des Kontos",
+        "es": "Región de la cuenta"
+      },
+      "description": {
+        "en": "Europe for an account created in Europe, United States for America and Japan. A wrong choice is corrected at login and reported by Test the connection.",
+        "fr": "Europe pour un compte créé en Europe, États-Unis pour l'Amérique et le Japon. Un mauvais choix est corrigé à la connexion et signalé par Tester la connexion.",
+        "de": "Europa für ein in Europa angelegtes Konto, USA für Amerika und Japan. Eine falsche Wahl wird beim Anmelden korrigiert und von Verbindung testen gemeldet.",
+        "es": "Europa para una cuenta creada en Europa, Estados Unidos para América y Japón. Una elección errónea se corrige al iniciar sesión y la señala Probar la conexión."
+      },
       "required": false,
-      "default": "celsius",
+      "default": "eu",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "eu",
+          "label": { "en": "Europe", "fr": "Europe", "de": "Europa", "es": "Europa" }
+        },
+        {
+          "value": "us",
+          "label": {
+            "en": "United States",
+            "fr": "États-Unis",
+            "de": "USA",
+            "es": "Estados Unidos"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
+      "key": "poll_interval",
       "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Seconds between two reads of each added device, one minute at least.",
+        "fr": "Secondes entre deux lectures de chaque appareil ajouté, une minute au moins.",
+        "de": "Sekunden zwischen zwei Abfragen jedes hinzugefügten Geräts, mindestens eine Minute.",
+        "es": "Segundos entre dos lecturas de cada dispositivo añadido, un minuto como mínimo."
       },
       "required": false,
-      "default": 300,
+      "default": 60,
       "min": 60,
       "max": 3600
+    },
+    {
+      "key": "filter_alert_percent",
+      "type": "number",
+      "label": {
+        "en": "Filter alert threshold (%)",
+        "fr": "Seuil d'alerte du filtre (%)",
+        "de": "Warnschwelle des Filters (%)",
+        "es": "Umbral de alerta del filtro (%)"
+      },
+      "description": {
+        "en": "The filter to replace trigger fires when a purifier filter goes down to this value.",
+        "fr": "Le déclencheur filtre à changer part quand le filtre d'un purificateur descend à cette valeur.",
+        "de": "Der Auslöser Filter wechseln wird ausgelöst, wenn ein Luftreinigerfilter auf diesen Wert fällt.",
+        "es": "El activador filtro que cambiar se dispara cuando el filtro de un purificador baja a este valor."
+      },
+      "required": false,
+      "default": 10,
+      "min": 0,
+      "max": 50
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the feature names",
+        "fr": "Langue des noms de fonctionnalités",
+        "de": "Sprache der Funktionsnamen",
+        "es": "Idioma de los nombres de funciones"
+      },
+      "description": {
+        "en": "Names given to the features of a device when it is added, and labels of the mode lists.",
+        "fr": "Noms donnés aux fonctionnalités d'un appareil à son ajout, et libellés des listes de modes.",
+        "de": "Namen der Funktionen eines Geräts beim Hinzufügen und Beschriftungen der Moduslisten.",
+        "es": "Nombres dados a las funciones de un dispositivo al añadirlo y etiquetas de las listas de modos."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": { "en": "English", "fr": "Anglais", "de": "Englisch", "es": "Inglés" }
+        },
+        {
+          "value": "fr",
+          "label": { "en": "French", "fr": "Français", "de": "Französisch", "es": "Francés" }
+        },
+        {
+          "value": "de",
+          "label": { "en": "German", "fr": "Allemand", "de": "Deutsch", "es": "Alemán" }
+        },
+        {
+          "value": "es",
+          "label": { "en": "Spanish", "fr": "Espagnol", "de": "Spanisch", "es": "Español" }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
       "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "filter_change_needed",
+      "label": {
+        "en": "Purifier filter to replace",
+        "fr": "Filtre de purificateur à changer",
+        "de": "Luftreinigerfilter wechseln",
+        "es": "Filtro del purificador que cambiar"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "A purifier filter went down to the alert threshold of the configuration. Fired once per filter.",
+        "fr": "Le filtre d'un purificateur est descendu au seuil d'alerte de la configuration. Une fois par filtre.",
+        "de": "Ein Luftreinigerfilter ist auf die Warnschwelle der Konfiguration gefallen. Einmal pro Filter.",
+        "es": "El filtro de un purificador ha bajado al umbral de alerta de la configuración. Una vez por filtro."
       },
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
-          ]
+          "label": {
+            "en": "Purifier",
+            "fr": "Purificateur",
+            "de": "Luftreiniger",
+            "es": "Purificador"
+          }
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "device_name",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Purifier name",
+            "fr": "Nom du purificateur",
+            "de": "Name des Luftreinigers",
+            "es": "Nombre del purificador"
+          }
+        },
+        {
+          "key": "filter_life",
+          "type": "number",
+          "label": {
+            "en": "Filter life (%)",
+            "fr": "Durée de vie du filtre (%)",
+            "de": "Filterlebensdauer (%)",
+            "es": "Vida útil del filtro (%)"
+          }
         }
       ]
-    }
-  ],
-  "scene_actions": [
+    },
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "water_tank_empty",
+      "label": {
+        "en": "Humidifier tank empty",
+        "fr": "Réservoir d'humidificateur vide",
+        "de": "Luftbefeuchtertank leer",
+        "es": "Depósito del humidificador vacío"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "A humidifier reports its water tank empty. Fired once, until the tank is filled again.",
+        "fr": "Un humidificateur signale son réservoir vide. Une fois, jusqu'au prochain remplissage.",
+        "de": "Ein Luftbefeuchter meldet seinen Wassertank leer. Einmal, bis der Tank wieder gefüllt ist.",
+        "es": "Un humidificador indica que su depósito está vacío. Una vez, hasta que se vuelva a llenar."
+      },
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
+          "label": {
+            "en": "Humidifier",
+            "fr": "Humidificateur",
+            "de": "Luftbefeuchter",
+            "es": "Humidificador"
+          }
         }
       ],
-      "outputs": [
+      "variables": [
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "device_name",
+          "type": "string",
+          "label": {
+            "en": "Humidifier name",
+            "fr": "Nom de l'humidificateur",
+            "de": "Name des Luftbefeuchters",
+            "es": "Nombre del humidificador"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "air_quality",
+      "label": {
+        "en": "VeSync air quality",
+        "fr": "Qualité de l'air VeSync",
+        "de": "VeSync-Luftqualität",
+        "es": "Calidad del aire VeSync"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "PM2.5 and humidity of your devices, their mode, an empty tank, a filter to replace.",
+        "fr": "PM2,5 et humidité de vos appareils, leur mode, un réservoir vide, un filtre à changer.",
+        "de": "PM2,5 und Luftfeuchtigkeit deiner Geräte, ihr Modus, ein leerer Tank, ein Filter zum Wechseln.",
+        "es": "PM2,5 y humedad de sus dispositivos, su modo, un depósito vacío, un filtro que cambiar."
+      },
+      "icon": "wind",
+      "settings": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Only this device",
+            "fr": "Seulement cet appareil",
+            "de": "Nur dieses Gerät",
+            "es": "Solo este dispositivo"
+          },
+          "description": {
+            "en": "Leave empty to show every added device.",
+            "fr": "Laissez vide pour afficher tous les appareils ajoutés.",
+            "de": "Leer lassen, um alle hinzugefügten Geräte anzuzeigen.",
+            "es": "Déjelo vacío para mostrar todos los dispositivos añadidos."
+          },
+          "required": false
+        }
+      ]
     }
   ]
 }
