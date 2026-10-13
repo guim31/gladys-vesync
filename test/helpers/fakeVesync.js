@@ -25,7 +25,6 @@ export const HOME_ASSISTANT = {
   purifierV2: fixture('home-assistant/air-purifier-detail-v2.json'),
   humidifier: fixture('home-assistant/humidifier-detail.json'),
   humidifier6000s: fixture('home-assistant/humidifier-6000s-detail.json'),
-  outlet: fixture('home-assistant/outlet-detail.json'),
 };
 
 /** pyvesync fixture key (its `setup_entry`) → a `deviceType` the cloud lists. */
